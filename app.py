@@ -31,7 +31,6 @@ def create_synthetic_dataset():
         'Numeric_Feature_2': np.random.randn(n_samples) * 20 + 50,
         'Categorical_Feature_1': np.random.choice(['A', 'B', 'C', 'D'], n_samples),
         'Categorical_Feature_2': np.random.choice(['High', 'Medium', 'Low'], n_samples),
-        'Time_Series_Feature': pd.date_range('2024-01-01', periods=n_samples, freq='D'),
         'Target_Variable': np.random.rand(n_samples) * 50 + 10  # Example Target
     }
     return pd.DataFrame(data)
@@ -42,7 +41,7 @@ synthetic_df = create_synthetic_dataset()
 st.header("1. Data Loading")
 st.subheader("Dataset Source")
 st.markdown(
-    "This application uses a **synthetic dataset** for demonstration. It mimics real-world data with numeric, categorical, and time-series features. "
+    "This application uses a **synthetic dataset** for demonstration. It mimics real-world data with numeric and categorical features. "
     "You can also **upload your own CSV dataset** to explore its insights using MoDeVa-like operations."
 )
 
@@ -131,7 +130,7 @@ if df is not None: # Proceed if df is loaded successfully (either synthetic or u
         st.markdown(f"### Bivariate Analysis: {feature_x} vs {feature_y}")
 
         # --- Scatter Plot ---
-        if df[feature_x].dtype in np.number and df[feature_y].dtype in np.number:
+        if np.issubdtype(df[feature_x].dtype, np.number) and np.issubdtype(df[feature_y].dtype, np.number):
             st.markdown("#### Scatter Plot")
             fig_scatter, ax_scatter = plt.subplots(figsize=(8, 6))
             sns.scatterplot(x=feature_x, y=feature_y, data=df, ax=ax_scatter)
@@ -146,11 +145,11 @@ if df is not None: # Proceed if df is loaded successfully (either synthetic or u
             )
 
         # --- Box Plot (if one is numeric and one is categorical) ---
-        elif (df[feature_x].dtype in np.number and df[feature_y].dtype == 'object') or \
-             (df[feature_y].dtype in np.number and df[feature_x].dtype == 'object'):
+        elif (np.issubdtype(df[feature_x].dtype, np.number) and df[feature_y].dtype == 'object') or \
+             (np.issubdtype(df[feature_y].dtype, np.number) and df[feature_x].dtype == 'object'):
             st.markdown("#### Box Plot")
-            numeric_feature = feature_x if df[feature_x].dtype in np.number else feature_y
-            categorical_feature = feature_y if df[feature_x].dtype in np.number else feature_x
+            numeric_feature = feature_x if np.issubdtype(df[feature_x].dtype, np.number) else feature_y
+            categorical_feature = feature_y if np.issubdtype(df[feature_x].dtype, np.number) else feature_x
 
             fig_boxplot, ax_boxplot = plt.subplots(figsize=(8, 6))
             sns.boxplot(x=categorical_feature, y=numeric_feature, data=df, ax=ax_boxplot)
